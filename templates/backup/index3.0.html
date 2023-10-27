@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Prediction App</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        form {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    
+#chatbot-messages div {
+    margin-bottom: 10px;
+}
+
+</style>
+</head>
+<body>
+
+<form action="/" method="post" class="mt-5">
+    <label for="customer_type" class="font-weight-bold">Are you an Existing Customer or New Customer?</label><br>
+    <select name="customer_type" id="customer_type" class="form-control mb-3">
+        <option value="existing">Existing Customer</option>
+        <option value="new">New Customer</option>
+    </select>
+
+    <div id="existing_fields">
+        <label for="cust_code" class="font-weight-bold">Enter your cust_code:</label>
+        <input type="number" name="cust_code" class="form-control mb-3">
+    </div>
+
+    <!-- Fields for New Customer -->
+    <div id="new_fields" style="display: none;">
+        <label for="loan_amount">Enter the loan amount required: </label>
+        <input type="number" name="loan_amount"><br><br>
+
+        <label for="term">Enter 1 for 'Short Term' and 2 for 'Long Term': </label>
+	<input type="number" name="term"><br><br>
+
+        <label for="credit_score">Enter your Credit Score: </label>
+        <input type="number" name="credit_score"><br><br>
+
+        <label for="income">Enter your Household Income: </label>
+        <input type="number" name="income"><br><br>
+
+        <label for="job_experience">Enter the number of years of experience in your job (e.g. 1, 2, 3): </label>
+        <input type="number" name="job_experience"><br><br>
+
+        <label for="home_ownership">Enter 1 for 'Rent', 2 for 'Home Mortgage', and 3 for 'Own Home': </label>
+        <input type="number" name="home_ownership"><br><br>
+
+        <label for="loan_type">Enter 1 for 'Personal Loan', 2 for 'Home Loan', 3 for 'Business Loan', 4 for 'Education Loan', 5 for 'Vehicle Loan', 6 for 'shopping loan', and 7 for 'wedding loan': </label>
+        <input type="number" name="loan_type"><br><br>
+
+        <label for="monthly_debt">Enter your Monthly Debt: </label>
+        <input type="number" step="0.01" name="monthly_debt"><br><br>
+
+        <label for="credit_history">Enter the Years of Credit History: </label>
+        <input type="number" step="0.01" name="credit_history"><br><br>
+    </div>
+
+    <input type="submit" value="Submit" class="btn btn-primary mt-3">
+</form>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $('#customer_type').on('change', function() {
+        if ($(this).val() === 'existing') {
+            $('#existing_fields').show();
+            $('#new_fields').hide();
+        } else {
+            $('#existing_fields').hide();
+            $('#new_fields').show();
+        }
+    });
+</script>
+
+<!-- Display the results -->
+{% if result %}
+    <div class="mt-5">
+        <h2>Result:</h2>
+        <p class="alert alert-info">{{ result }}</p>
+    </div>
+{% endif %}
+
+
+<!-- Chatbot Panel -->
+<div id="chatbot" style="position: fixed; bottom: 60px; right: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px; width: 300px; height: 400px; display: none;">
+    <div class="chatbot-header" style="background-color: #007BFF; padding: 10px; color: white; border-top-left-radius: 5px; border-top-right-radius: 5px;">
+        Chat with us!
+    </div>
+    <div id="chatbot-messages" style="max-height: 300px; overflow-y: auto; padding: 10px;"></div>
+    <div class="input-group">
+        <input type="text" id="chatbot-input" placeholder="Ask me anything..." class="form-control">
+        <div class="input-group-append">
+            <button onclick="sendQuery()" class="btn btn-primary">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Chatbot Toggle Button -->
+<div id="chatbot-toggle" style="position: fixed; bottom: 10px; right: 10px; z-index: 1000;">
+    <button onclick="toggleChatbot()" class="btn btn-primary">
+        <i class="fa fa-comments" aria-hidden="true"></i>
+    </button>
+</div>
+
+    <div id="chatbot-messages" style="max-height: 300px; overflow-y: auto;"></div>
+    <input type="text" id="chatbot-input" placeholder="Ask me anything..." style="width: 80%;">
+    <button onclick="sendQuery()">Send</button>
+</div>
+
+<script>
+    
+function toggleChatbot() {
+    const chatbotPanel = document.getElementById('chatbot');
+    if (chatbotPanel.style.display === "none") {
+        chatbotPanel.style.display = "block";
+    } else {
+        chatbotPanel.style.display = "none";
+    }
+}
+
+function sendQuery() {
+        const userInput = document.getElementById('chatbot-input').value;
+        const chatbotMessages = document.getElementById('chatbot-messages');
+        chatbotMessages.innerHTML += '<div><b>You:</b> ' + userInput + '</div>';
+
+        fetch('/chatbot_query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query: userInput })
+        })
+        .then(response => response.json())
+        .then(data => {
+            chatbotMessages.innerHTML += '<div><b>Bot:</b> ' + data.response + '</div>';
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+            document.getElementById('chatbot-input').value = '';
+            
+            if (data.response.includes("Please wait")) {
+                setTimeout(() => {
+                    fetchResult();
+                }, 5000); 
+            }
+        });
+    }
+
+    function fetchResult() {
+        fetch('/chatbot_query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ query: "" })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const chatbotMessages = document.getElementById('chatbot-messages');
+            chatbotMessages.innerHTML += '<div><b>Bot:</b> ' + data.response + '</div>';
+            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+        });
+    }
+</script>
+
+</body>
+</html>

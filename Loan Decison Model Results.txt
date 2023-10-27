@@ -1,0 +1,13 @@
+1) Accuracy: 81.05%
+2)Precision(Charged-off)0 : 0.4205
+3) Precison (Fully-Paid)1 : 0.7829
+4)Recall(Charged-off)0 : 0.0641
+5) Recall (Fully-Paid)1 : 0.9745
+6)F1 Score (Charged-off)0 : 0.1112
+7)F1 Score (Fully-Paid)1 :0.8682
+8)confusion Matrix:
+True Negative (TN): 201
+False Positive (FP): 2936
+False Negative (FN): 277
+True Positive (TP): 10586
+9)AUC-ROC: 0.6727

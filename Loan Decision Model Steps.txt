@@ -1,0 +1,43 @@
+1. Data Loading and Exploration:
+We started by loading the dataset and inspecting its initial few rows. This step helped us understand the structure of the dataset, the available features, and the target variable (Loan Status).
+
+2. Data Preprocessing:
+We took several steps to preprocess the data:
+
+Handling Missing Values: We checked for missing values, but the dataset didn't have any.
+Encoding Categorical Variables: Machine learning models require numerical input, so we encoded categorical variables like Term, Home Ownership, Loan_type, and Loan Status using label encoders.
+3. Data Splitting:
+We split the dataset into training (80%) and testing (20%) sets. This ensures that we have separate data to evaluate the model's performance after training.
+
+4. Model Selection and Training:
+We chose the Random Forest classifier for the following reasons:
+
+Versatility: It works well for both regression and classification tasks.
+Performance: Random Forest tends to provide good results out-of-the-box with minimal tuning.
+Handling Overfitting: By combining multiple decision trees, Random Forest reduces the risk of overfitting.
+Feature Importance: Random Forest provides insights into which features are most important in making predictions.
+We then trained the Random Forest classifier on the training data.
+
+5. Model Evaluation:
+After training, we used the testing data to evaluate the model's performance. Specifically, we looked at:
+
+Accuracy: This metric tells us the fraction of predictions our model got right. The model achieved an accuracy of approximately 77.05% on the testing data.
+Classification Report: We also generated a classification report that provided precision, recall, and F1-score for both classes (Charged Off and Fully Paid). The model performed significantly better on the "Fully Paid" class, which indicated potential class imbalance.
+6. Model Interpretation:
+The model's predictions were then interpreted in the context of loan eligibility. If the model predicted "Fully Paid", we inferred that the applicant was "Eligible" for the loan. Conversely, if the model predicted "Charged Off", we inferred that the applicant was "Not Eligible".
+
+7. Model Saving:
+For future use and deployment, we saved the trained Random Forest model and the label encoders using the joblib library.
+
+8. Test Data:
+
+Current Loan Amount: The amount of loan requested.
+Term: The term of the loan, which can be either "Short Term" or "Long Term".
+Credit Score: The credit score of the customer.
+household_income: The income of the customer's household.
+Years in current job: The number of years the customer has been in their current job (as a numeric value).
+Home Ownership: The home ownership status, such as "Rent" or "Home Mortgage".
+Loan_type: Type of the loan (e.g., "Personal Loan", "Home Loan").
+Monthly Debt: The customer's monthly debt.
+Years of Credit History: The number of years of the customer's credit history.
+
